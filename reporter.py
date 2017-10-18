@@ -140,7 +140,7 @@ if __name__ == '__main__':
 	#  time you run this code, any time after that you will have to comment  #
 	#  them out.                                                             #
 	##########################################################################   
-	articles_and_authors()
+	#articles_and_authors()
 	update_log()
 	articles_and_logs()
 	requests_per_day()
@@ -149,14 +149,22 @@ if __name__ == '__main__':
 	##########################################################################
 
 	top_3_articles = top_three_articles()
-	print """This is a list of the top three articles and their respective
-	number of views: """ + str(top_3_articles)
 	top_3_authors = top_three_authors()
-	print """This lists the top three authors and their respective total views
-	over all of their articles: """ + str(top_3_articles)
 	bad_days = days_with_too_many_errors()
-	print """This lists pairs of days with more than one percent of requests
-	resulting in error and their respective proportions: 
-	""" + str(top_3_articles)
 
 	db_conn.close()
+
+	results_file = open(“reporter_results.txt”, “w”)
+	results_file.write("""This first list gives the top three articles in our
+		database along with their respective number of views.""")
+	results_file.write(str(top_3_articles))
+	results_file.write("""Secondly, this lists the top three authors in our
+		database along with their respective total views for all articles they
+		have written.""")
+	results_file.write(str(top_3_authors))
+	results_file.write("""Finally, this last list tells us the days in which
+		more than one percent of its requests resulted in an error and also
+		tells us the proportion of errors with respect to the total requests.
+		""")
+	results_file.write(str(bad_days))
+	results_file.close()
