@@ -113,11 +113,11 @@ def error_requests_per_day():
 
 
 def total_and_errors():
-    """This function creates a table called total_and_errors by joining the
+    """This function creates a view called total_and_errors by joining the
     requests_per_day table and the error_requests_per_day table on the
     requests_per_day.date column and the error_requests_per_day.e_date column.
     """
-    cursor.execute("""create table total_and_errors as select * from
+    cursor.execute("""create view total_and_errors as select * from
         requests_per_day join error_requests_per_day on requests_per_day.date
         = error_requests_per_day.e_date""")
     db_conn.commit()
