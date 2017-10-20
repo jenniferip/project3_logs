@@ -6,6 +6,7 @@ the answers to the following three questions:
 3) On which days did more than one percent of requests lead to errors?.
 """
 
+#!/usr/bin/env python
 import re
 import psycopg2
 
@@ -17,9 +18,9 @@ def articles_and_authors():
     authors' id column. This view will be useful in finding the top three
     articles and authors once it is combined with the log table.
     """
-    cursor.execute("""create or replace view articles_and_authors as select
-        authors.name, articles.title, articles.slug from authors, articles
-        where articles.author = authors.id""")
+    cursor.execute("""CREATE OR REPLACE VIEW articles_and_authors AS SELECT
+        authors.name, articles.title, articles.slug FROM authors, articles
+        WHERE articles.author = authors.id""")
     db_conn.commit()
 
 
@@ -32,8 +33,8 @@ def article_author_log():
     from the log table. This will be useful in finding the top three articles
     and authors.
     """
-    cursor.execute("""create or replace view article_author_log as select *
-        from articles_and_authors left join log on log.path like
+    cursor.execute("""CREATE OR REPLACE VIEW article_author_log AS SELECT *
+        FROM articles_and_authors LEFT JOIN log ON log.path LIKE
         '%'||articles_and_authors.slug||'%'""")
     db_conn.commit()
 
@@ -42,9 +43,9 @@ def top_three_articles():
     """This function finds the top three most popular articles of all time
     using the view called article_author_log.
     """
-    cursor.execute("""select title, count(method) as num_views from
-        article_author_log where status = '200 OK' group by title order by
-        num_views desc limit 3""")
+    cursor.execute("""SELECT title, count(method) AS num_views FROM
+        article_author_log WHERE status = '200 OK' GROUP BY title ORDER BY
+        num_views DESC LIMIT 3""")
     db_conn.commit()
     return cursor.fetchall()
 
@@ -54,9 +55,9 @@ def top_three_authors():
     most popular authors of all time ie. the top three most viewed authors
     over all of their articles.
     """
-    cursor.execute("""select name, count(method) as num_views from
-        article_author_log where status = '200 OK' group by name order by
-        num_views desc limit 3""")
+    cursor.execute("""SELECT name, count(method) AS num_views FROM
+        article_author_log WHERE status = '200 OK' GROUP BY name ORDER BY
+        num_views DESC LIMIT 3""")
     db_conn.commit()
     return cursor.fetchall()
 
@@ -66,8 +67,8 @@ def requests_per_day():
     called date and total_requests. This is in preparation to answer question
     three.
     """
-    cursor.execute("""create or replace view requests_per_day as select
-        date(time), count(*) as total_requests from log group by
+    cursor.execute("""CREATE OR REPLACE VIEW requests_per_day AS SELECT
+        date(time), count(*) AS total_requests FROM log GROUP BY
         date(time)""")
     db_conn.commit()
 
@@ -77,9 +78,9 @@ def error_requests_per_day():
     columns called e_date and num_errors. This is in preparation to answer
     question three.
     """
-    cursor.execute("""create or replace view error_requests_per_day as select
-        date(time) as e_date, count(*) as num_errors from log where status =
-        '404 NOT FOUND' group by e_date""")
+    cursor.execute("""CREATE OR REPLACE VIEW error_requests_per_day AS SELECT
+        date(time) AS e_date, count(*) AS num_errors FROM log WHERE status =
+        '404 NOT FOUND' GROUP BY e_date""")
     db_conn.commit()
 
 
@@ -88,8 +89,8 @@ def total_and_errors():
     requests_per_day table and the error_requests_per_day table on the
     requests_per_day.date column and the error_requests_per_day.e_date column.
     """
-    cursor.execute("""create or replace view total_and_errors as select * from
-        requests_per_day join error_requests_per_day on requests_per_day.date
+    cursor.execute("""CREATE OR REPLACE VIEW total_and_errors AS SELECT * FROM
+        requests_per_day JOIN error_requests_per_day ON requests_per_day.date
         = error_requests_per_day.e_date""")
     db_conn.commit()
 
@@ -98,9 +99,9 @@ def days_with_too_many_errors():
     """This function finds the days in which more than one percent of its
     requests resulted in an error and what the respective percentage was.
     """
-    cursor.execute("""select date,
-        (cast(num_errors as float)/cast(total_requests as float)) from
-        total_and_errors where
+    cursor.execute("""SELECT date,
+        (cast(num_errors as float)/cast(total_requests as float)) FROM
+        total_and_errors WHERE
         (cast(num_errors as float)/cast(total_requests as float)) > 0.01""")
     db_conn.commit()
     return cursor.fetchall()
