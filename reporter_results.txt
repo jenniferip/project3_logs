@@ -1,0 +1,14 @@
+These are the top three articles in our database with their respective number of views.
+                       
+Candidate is jerk, alleges rival - 338647 views 
+Bears love berries, alleges bear - 253801 views 
+Bad things gone, say good people - 170098 views 
+
+Next, are the top three authors in our database with their respective total views over all articles they have written.
+Ursula La Multa - 507594 views 
+Rudolf von Treppenwitz - 423457 views 
+Anonymous Contributor - 170098 views 
+Markoff Chaney - 84557 views 
+
+Finally, these are the days in which more than one percent of its requests resulted in an errorthe percent of errors.
+2016-07-17 - 2.2626862468%

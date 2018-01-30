@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """This reporter.py file holds the Python code that analyzes the news
 database, using SQL style querying and outputs a plain text file containing
 the answers to the following three questions:
@@ -6,8 +8,7 @@ the answers to the following three questions:
 3) On which days did more than one percent of requests lead to errors?.
 """
 
-#!/usr/bin/env python
-import re
+
 import psycopg2
 
 
@@ -34,8 +35,8 @@ def article_author_log():
     and authors.
     """
     cursor.execute("""CREATE OR REPLACE VIEW article_author_log AS SELECT *
-        FROM articles_and_authors LEFT JOIN log ON log.path LIKE
-        '%'||articles_and_authors.slug||'%'""")
+        FROM articles_and_authors LEFT JOIN log ON log.path = '/article/' || 
+        articles_and_authors.slug""")
     db_conn.commit()
 
 
@@ -46,7 +47,6 @@ def top_three_articles():
     cursor.execute("""SELECT title, count(method) AS num_views FROM
         article_author_log WHERE status = '200 OK' GROUP BY title ORDER BY
         num_views DESC LIMIT 3""")
-    db_conn.commit()
     return cursor.fetchall()
 
 
@@ -57,8 +57,7 @@ def top_three_authors():
     """
     cursor.execute("""SELECT name, count(method) AS num_views FROM
         article_author_log WHERE status = '200 OK' GROUP BY name ORDER BY
-        num_views DESC LIMIT 3""")
-    db_conn.commit()
+        num_views DESC""")
     return cursor.fetchall()
 
 
@@ -103,7 +102,6 @@ def days_with_too_many_errors():
         (cast(num_errors as float)/cast(total_requests as float)) FROM
         total_and_errors WHERE
         (cast(num_errors as float)/cast(total_requests as float)) > 0.01""")
-    db_conn.commit()
     return cursor.fetchall()
 
 
